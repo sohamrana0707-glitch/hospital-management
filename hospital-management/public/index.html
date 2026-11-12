@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic & Hospital Management Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Dark Sidebar -->
+    <sidebar>
+        <div class="logo">🏥 Hospital Portal</div>
+        <div class="nav-links">
+            <button class="tab-btn active" onclick="switchTab(event, 'patientsTab')">👥 Patients</button>
+            <button class="tab-btn" onclick="switchTab(event, 'doctorsTab')">🩺 Doctors</button>
+            <button class="tab-btn" onclick="switchTab(event, 'appointmentsTab')">📅 Appointments</button>
+            <button class="tab-btn" onclick="switchTab(event, 'prescriptionsTab')">💊 Prescriptions</button>
+            <button class="tab-btn" onclick="switchTab(event, 'billingTab')">💳 Billing</button>
+            <button class="tab-btn" onclick="switchTab(event, 'analyticsTab'); loadAnalytics();">📊 Analytics</button>
+        </div>
+    </sidebar>
+
+    <!-- Main Dashboard Container -->
+    <div class="main-content">
+
+        <!-- 1. Patients Tab -->
+        <div id="patientsTab" class="tab-content active">
+            <div class="grid">
+                <div class="card">
+                    <h2>Register New Patient</h2>
+                    <form id="patientForm">
+                        <label>First Name</label>
+                        <input type="text" id="p_first" required>
+
+                        <label>Last Name</label>
+                        <input type="text" id="p_last" required>
+
+                        <label>Gender</label>
+                        <select id="p_gender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                        <label>Date of Birth</label>
+                        <input type="date" id="p_dob" required>
+
+                        <label>Phone Number</label>
+                        <input type="text" id="p_phone" required>
+
+                        <button type="submit" class="action-btn">Save Patient</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Patient Records</h2>
+                    <input type="text" id="patientSearch" class="search-box"
+                        placeholder="🔍 Search patients..."
+                        onkeyup="filterTable('patientTableBody', this.value)">
+
+                    <button class="refresh-btn" onclick="loadPatients()">Refresh List</button>
+
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th><th>Name</th><th>Gender</th><th>Phone</th><th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patientTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Doctors Tab -->
+        <div id="doctorsTab" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <h2>Add New Doctor</h2>
+                    <form id="doctorForm">
+                        <label>First Name</label>
+                        <input type="text" id="d_first" required>
+
+                        <label>Last Name</label>
+                        <input type="text" id="d_last" required>
+
+                        <label>Specialization</label>
+                        <input type="text" id="d_spec" placeholder="e.g., Cardiologist" required>
+
+                        <label>Phone Number</label>
+                        <input type="text" id="d_phone" required>
+
+                        <label>Consultation Fee (₹)</label>
+                        <input type="number" id="d_fee" step="0.01" required>
+
+                        <button type="submit" class="action-btn">Save Doctor</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Doctor Directory</h2>
+                    <input type="text" id="doctorSearch" class="search-box"
+                        placeholder="🔍 Search doctors..."
+                        onkeyup="filterTable('doctorTableBody', this.value)">
+
+                    <button class="refresh-btn" onclick="loadDoctors()">Refresh List</button>
+
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th><th>Name</th><th>Specialization</th><th>Fee</th><th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctorTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Appointments Tab -->
+        <div id="appointmentsTab" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <h2>Schedule Appointment</h2>
+                    <form id="appointmentForm">
+                        <label>Patient ID</label>
+                        <input type="number" id="a_patient_id" placeholder="Enter Patient ID" required>
+
+                        <label>Doctor ID</label>
+                        <input type="number" id="a_doctor_id" placeholder="Enter Doctor ID" required>
+
+                        <label>Appointment Date & Time</label>
+                        <input type="datetime-local" id="a_date" required>
+
+                        <button type="submit" class="action-btn">Book Appointment</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Appointment Schedule</h2>
+                    <button class="refresh-btn" onclick="loadAppointments()">Refresh List</button>
+
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th><th>Patient</th><th>Doctor</th>
+                                    <th>Specialization</th><th>Date</th><th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Prescriptions Tab -->
+        <div id="prescriptionsTab" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <h2>Issue Prescription</h2>
+                    <form id="prescriptionForm">
+                        <label>Appointment ID</label>
+                        <input type="number" id="rx_apt_id" placeholder="Enter Appointment ID" required>
+
+                        <label>Medication Name</label>
+                        <input type="text" id="rx_med" placeholder="e.g., Paracetamol" required>
+
+                        <label>Dosage</label>
+                        <input type="text" id="rx_dosage" placeholder="e.g., 500mg" required>
+
+                        <label>Instructions</label>
+                        <textarea id="rx_instructions" rows="3"
+                            placeholder="Take twice daily" required></textarea>
+
+                        <button type="submit" class="action-btn">Save Prescription</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Prescription Lookup</h2>
+                    <label>Enter Appointment ID:</label>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="number" id="lookupAptId" placeholder="Apt ID" style="margin-bottom:0;">
+                        <button class="action-btn" style="width: auto;" onclick="loadPrescriptions()">Fetch</button>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rx ID</th><th>Medication</th><th>Dosage</th><th>Instructions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prescriptionTableBody">
+                                <tr>
+                                    <td colspan="4" style="text-align:center; color:var(--text-muted);">
+                                        Enter an Appointment ID
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Billing Tab -->
+        <div id="billingTab" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <h2>Generate Bill</h2>
+                    <form id="billingForm">
+                        <label>Appointment ID</label>
+                        <input type="number" id="bill_apt_id" placeholder="Enter Appointment ID" required>
+
+                        <label>Total Amount (₹)</label>
+                        <input type="number" id="bill_amount" step="0.01" placeholder="500.00" required>
+
+                        <label>Payment Status</label>
+                        <select id="bill_status">
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid</option>
+                        </select>
+
+                        <button type="submit" class="action-btn">Generate Bill</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Billing Record Lookup</h2>
+                    <label>Enter Appointment ID:</label>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="number" id="lookupBillId" placeholder="Apt ID" style="margin-bottom:0;">
+                        <button class="action-btn" style="width: auto;" onclick="loadBilling()">Fetch Bill</button>
+                    </div>
+
+                    <div id="billResult"
+                        style="background:#0f172a; padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
+                        No bill selected.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Analytics Tab -->
+        <div id="analyticsTab" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <h2>Patient Gender Breakdown</h2>
+                    <canvas id="patientGenderChart"></canvas>
+                </div>
+
+                <div class="card">
+                    <h2>System Summary Overview</h2>
+                    <canvas id="systemOverviewChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
