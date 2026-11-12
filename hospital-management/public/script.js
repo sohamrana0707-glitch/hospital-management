@@ -30,7 +30,7 @@ document.getElementById('patientForm').addEventListener('submit', async (e) => {
         phone: document.getElementById('p_phone').value
     };
 
-    await fetch('http://localhost:5000/api/patients', {
+    await fetch('/api/patients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -41,7 +41,7 @@ document.getElementById('patientForm').addEventListener('submit', async (e) => {
 });
 
 async function loadPatients() {
-    const res = await fetch('http://localhost:5000/api/patients');
+    const res = await fetch('/api/patients');
     const data = await res.json();
 
     const tbody = document.getElementById('patientTableBody');
@@ -75,7 +75,7 @@ document.getElementById('doctorForm').addEventListener('submit', async (e) => {
         consultation_fee: document.getElementById('d_fee').value
     };
 
-    await fetch('http://localhost:5000/api/doctors', {
+    await fetch('/api/doctors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -86,7 +86,7 @@ document.getElementById('doctorForm').addEventListener('submit', async (e) => {
 });
 
 async function loadDoctors() {
-    const res = await fetch('http://localhost:5000/api/doctors');
+    const res = await fetch('/api/doctors');
     const data = await res.json();
 
     const tbody = document.getElementById('doctorTableBody');
@@ -118,7 +118,7 @@ document.getElementById('appointmentForm').addEventListener('submit', async (e) 
         appointment_date: document.getElementById('a_date').value.replace('T', ' ') + ':00'
     };
 
-    await fetch('http://localhost:5000/api/appointments', {
+    await fetch('/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -129,7 +129,7 @@ document.getElementById('appointmentForm').addEventListener('submit', async (e) 
 });
 
 async function loadAppointments() {
-    const res = await fetch('http://localhost:5000/api/appointments');
+    const res = await fetch('/api/appointments');
     const data = await res.json();
 
     const tbody = document.getElementById('appointmentTableBody');
@@ -165,7 +165,7 @@ document.getElementById('prescriptionForm').addEventListener('submit', async (e)
         instructions: document.getElementById('rx_instructions').value
     };
 
-    const res = await fetch('http://localhost:5000/api/prescriptions', {
+    const res = await fetch('/api/prescriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -185,7 +185,7 @@ async function loadPrescriptions() {
         return;
     }
 
-    const res = await fetch(`http://localhost:5000/api/prescriptions/${aptId}`);
+    const res = await fetch(`/api/prescriptions/${aptId}`);
     const data = await res.json();
 
     const tbody = document.getElementById('prescriptionTableBody');
@@ -220,7 +220,7 @@ document.getElementById('billingForm').addEventListener('submit', async (e) => {
         payment_status: document.getElementById('bill_status').value
     };
 
-    const res = await fetch('http://localhost:5000/api/billing', {
+    const res = await fetch('/api/billing', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -241,12 +241,11 @@ async function loadBilling() {
         return;
     }
 
-    const res = await fetch(`http://localhost:5000/api/billing/${aptId}`);
+    const res = await fetch(`/api/billing/${aptId}`);
     const data = await res.json();
 
     const resultDiv = document.getElementById('billResult');
 
-    // Give the billing result box a clean appearance
     resultDiv.style.setProperty('background', '#ffffff', 'important');
     resultDiv.style.setProperty('color', '#17243a', 'important');
     resultDiv.style.setProperty('padding', '22px', 'important');
@@ -297,20 +296,19 @@ async function loadBilling() {
     `;
 }
 
-
 // --- Analytics Charts ---
 
 let genderChartInstance = null;
 let overviewChartInstance = null;
 
 async function loadAnalytics() {
-    const pRes = await fetch('http://localhost:5000/api/patients');
+    const pRes = await fetch('/api/patients');
     const patients = await pRes.json();
 
-    const dRes = await fetch('http://localhost:5000/api/doctors');
+    const dRes = await fetch('/api/doctors');
     const doctors = await dRes.json();
 
-    const aRes = await fetch('http://localhost:5000/api/appointments');
+    const aRes = await fetch('/api/appointments');
     const appointments = await aRes.json();
 
     const males = patients.filter(p => p.gender === 'Male').length;
@@ -387,7 +385,7 @@ async function loadAnalytics() {
 
 async function deleteRecord(endpoint, id) {
     if (confirm('Are you sure you want to delete this record?')) {
-        await fetch(`http://localhost:5000/api/${endpoint}/${id}`, {
+        await fetch(`/api/${endpoint}/${id}`, {
             method: 'DELETE'
         });
 
