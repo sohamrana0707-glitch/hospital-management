@@ -82,9 +82,9 @@ async function initDatabase() {
             );
         `);
 
-        // Create the missing appointment details view
+        // Create or replace the appointment details view (MySQL compatible)
         await db.query(`
-            CREATE VIEW IF NOT EXISTS vw_appointment_details AS
+            CREATE OR REPLACE VIEW vw_appointment_details AS
             SELECT 
                 a.appointment_id,
                 CONCAT(p.first_name, ' ', p.last_name) AS patient_name,
