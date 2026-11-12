@@ -30,36 +30,62 @@ document.getElementById('patientForm').addEventListener('submit', async (e) => {
         phone: document.getElementById('p_phone').value
     };
 
-    await fetch('/api/patients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
+    try {
+        const res = await fetch('/api/patients', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
 
-    document.getElementById('patientForm').reset();
-    loadPatients();
+        const result = await res.json();
+
+        if (!res.ok) {
+            alert('Error: ' + (result.error || 'Failed to save patient'));
+            return;
+        }
+
+        document.getElementById('patientForm').reset();
+        loadPatients();
+    } catch (err) {
+        alert('Network error while saving patient.');
+        console.error(err);
+    }
 });
 
 async function loadPatients() {
-    const res = await fetch('/api/patients');
-    const data = await res.json();
+    try {
+        const res = await fetch('/api/patients');
+        const data = await res.json();
 
-    const tbody = document.getElementById('patientTableBody');
-    tbody.innerHTML = '';
+        const tbody = document.getElementById('patientTableBody');
+        tbody.innerHTML = '';
 
-    data.forEach(p => {
-        tbody.innerHTML += `<tr>
-            <td>${p.patient_id}</td>
-            <td>${p.first_name} ${p.last_name}</td>
-            <td>${p.gender}</td>
-            <td>${p.phone}</td>
-            <td>
-                <button class="delete-btn" onclick="deleteRecord('patients', ${p.patient_id})">
-                    Delete
-                </button>
-            </td>
-        </tr>`;
-    });
+        if (!Array.isArray(data)) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#dc3545;">Error: ${data.error || 'Failed to load'}</td></tr>`;
+            return;
+        }
+
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No patients found</td></tr>`;
+            return;
+        }
+
+        data.forEach(p => {
+            tbody.innerHTML += `<tr>
+                <td>${p.patient_id}</td>
+                <td>${p.first_name} ${p.last_name}</td>
+                <td>${p.gender}</td>
+                <td>${p.phone}</td>
+                <td>
+                    <button class="delete-btn" onclick="deleteRecord('patients', ${p.patient_id})">
+                        Delete
+                    </button>
+                </td>
+            </tr>`;
+        });
+    } catch (err) {
+        console.error('Failed to load patients:', err);
+    }
 }
 
 // --- Doctors ---
@@ -75,36 +101,62 @@ document.getElementById('doctorForm').addEventListener('submit', async (e) => {
         consultation_fee: document.getElementById('d_fee').value
     };
 
-    await fetch('/api/doctors', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
+    try {
+        const res = await fetch('/api/doctors', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
 
-    document.getElementById('doctorForm').reset();
-    loadDoctors();
+        const result = await res.json();
+
+        if (!res.ok) {
+            alert('Error: ' + (result.error || 'Failed to save doctor'));
+            return;
+        }
+
+        document.getElementById('doctorForm').reset();
+        loadDoctors();
+    } catch (err) {
+        alert('Network error while saving doctor.');
+        console.error(err);
+    }
 });
 
 async function loadDoctors() {
-    const res = await fetch('/api/doctors');
-    const data = await res.json();
+    try {
+        const res = await fetch('/api/doctors');
+        const data = await res.json();
 
-    const tbody = document.getElementById('doctorTableBody');
-    tbody.innerHTML = '';
+        const tbody = document.getElementById('doctorTableBody');
+        tbody.innerHTML = '';
 
-    data.forEach(d => {
-        tbody.innerHTML += `<tr>
-            <td>${d.doctor_id}</td>
-            <td>Dr. ${d.first_name} ${d.last_name}</td>
-            <td>${d.specialization}</td>
-            <td>₹${d.consultation_fee}</td>
-            <td>
-                <button class="delete-btn" onclick="deleteRecord('doctors', ${d.doctor_id})">
-                    Delete
-                </button>
-            </td>
-        </tr>`;
-    });
+        if (!Array.isArray(data)) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#dc3545;">Error: ${data.error || 'Failed to load'}</td></tr>`;
+            return;
+        }
+
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No doctors found</td></tr>`;
+            return;
+        }
+
+        data.forEach(d => {
+            tbody.innerHTML += `<tr>
+                <td>${d.doctor_id}</td>
+                <td>Dr. ${d.first_name} ${d.last_name}</td>
+                <td>${d.specialization}</td>
+                <td>₹${d.consultation_fee}</td>
+                <td>
+                    <button class="delete-btn" onclick="deleteRecord('doctors', ${d.doctor_id})">
+                        Delete
+                    </button>
+                </td>
+            </tr>`;
+        });
+    } catch (err) {
+        console.error('Failed to load doctors:', err);
+    }
 }
 
 // --- Appointments ---
@@ -118,39 +170,65 @@ document.getElementById('appointmentForm').addEventListener('submit', async (e) 
         appointment_date: document.getElementById('a_date').value.replace('T', ' ') + ':00'
     };
 
-    await fetch('/api/appointments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
+    try {
+        const res = await fetch('/api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
 
-    document.getElementById('appointmentForm').reset();
-    loadAppointments();
+        const result = await res.json();
+
+        if (!res.ok) {
+            alert('Error: ' + (result.error || 'Failed to book appointment'));
+            return;
+        }
+
+        document.getElementById('appointmentForm').reset();
+        loadAppointments();
+    } catch (err) {
+        alert('Network error while booking appointment.');
+        console.error(err);
+    }
 });
 
 async function loadAppointments() {
-    const res = await fetch('/api/appointments');
-    const data = await res.json();
+    try {
+        const res = await fetch('/api/appointments');
+        const data = await res.json();
 
-    const tbody = document.getElementById('appointmentTableBody');
-    tbody.innerHTML = '';
+        const tbody = document.getElementById('appointmentTableBody');
+        tbody.innerHTML = '';
 
-    data.forEach(a => {
-        const formattedDate = new Date(a.appointment_date).toLocaleString();
+        if (!Array.isArray(data)) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#dc3545;">Error: ${data.error || 'Failed to load'}</td></tr>`;
+            return;
+        }
 
-        tbody.innerHTML += `<tr>
-            <td>${a.appointment_id}</td>
-            <td>${a.patient_name}</td>
-            <td>${a.doctor_name}</td>
-            <td>${a.specialization}</td>
-            <td>${formattedDate}</td>
-            <td>
-                <button class="delete-btn" onclick="deleteRecord('appointments', ${a.appointment_id})">
-                    Delete
-                </button>
-            </td>
-        </tr>`;
-    });
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No appointments found</td></tr>`;
+            return;
+        }
+
+        data.forEach(a => {
+            const formattedDate = new Date(a.appointment_date).toLocaleString();
+
+            tbody.innerHTML += `<tr>
+                <td>${a.appointment_id}</td>
+                <td>${a.patient_name}</td>
+                <td>${a.doctor_name}</td>
+                <td>${a.specialization}</td>
+                <td>${formattedDate}</td>
+                <td>
+                    <button class="delete-btn" onclick="deleteRecord('appointments', ${a.appointment_id})">
+                        Delete
+                    </button>
+                </td>
+            </tr>`;
+        });
+    } catch (err) {
+        console.error('Failed to load appointments:', err);
+    }
 }
 
 // --- Prescriptions ---
@@ -191,7 +269,7 @@ async function loadPrescriptions() {
     const tbody = document.getElementById('prescriptionTableBody');
     tbody.innerHTML = '';
 
-    if (data.length === 0) {
+    if (!Array.isArray(data) || data.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="4" style="text-align:center;">No prescriptions found</td>
@@ -231,7 +309,6 @@ document.getElementById('billingForm').addEventListener('submit', async (e) => {
     alert(result.message || 'Bill generated!');
     document.getElementById('billingForm').reset();
 });
-
 
 async function loadBilling() {
     const aptId = document.getElementById('lookupBillId').value;
@@ -311,9 +388,13 @@ async function loadAnalytics() {
     const aRes = await fetch('/api/appointments');
     const appointments = await aRes.json();
 
-    const males = patients.filter(p => p.gender === 'Male').length;
-    const females = patients.filter(p => p.gender === 'Female').length;
-    const others = patients.filter(p => p.gender === 'Other').length;
+    const patientList = Array.isArray(patients) ? patients : [];
+    const doctorList = Array.isArray(doctors) ? doctors : [];
+    const appointmentList = Array.isArray(appointments) ? appointments : [];
+
+    const males = patientList.filter(p => p.gender === 'Male').length;
+    const females = patientList.filter(p => p.gender === 'Female').length;
+    const others = patientList.filter(p => p.gender === 'Other').length;
 
     const ctxGender = document.getElementById('patientGenderChart').getContext('2d');
 
@@ -352,7 +433,7 @@ async function loadAnalytics() {
             labels: ['Patients', 'Doctors', 'Appointments'],
             datasets: [{
                 label: 'Total Count',
-                data: [patients.length, doctors.length, appointments.length],
+                data: [patientList.length, doctorList.length, appointmentList.length],
                 backgroundColor: ['#3b82f6', '#10b981', '#f59e0b']
             }]
         },
