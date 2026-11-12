@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
     res.json({ message: 'Hospital Management System API is running...' });
 });
 
-// Auto-create database tables sequentially on startup
+// Auto-create database tables and views sequentially on startup
 async function initDatabase() {
     try {
         await db.query(`
@@ -82,9 +82,23 @@ async function initDatabase() {
             );
         `);
 
-        console.log("All database tables verified/created successfully!");
+        // Create the missing appointment details view
+        await db.query(`
+            CREATE VIEW IF NOT EXISTS vw_appointment_details AS
+            SELECT 
+                a.appointment_id,
+                CONCAT(p.first_name, ' ', p.last_name) AS patient_name,
+                CONCAT(d.first_name, ' ', d.last_name) AS doctor_name,
+                d.specialization,
+                a.appointment_date
+            FROM Appointments a
+            JOIN Patients p ON a.patient_id = p.patient_id
+            JOIN Doctors d ON a.doctor_id = d.doctor_id;
+        `);
+
+        console.log("All database tables and views verified/created successfully!");
     } catch (err) {
-        console.error("Error creating tables:", err);
+        console.error("Error creating schema:", err);
     }
 }
 
