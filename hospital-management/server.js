@@ -25,6 +25,61 @@ app.get('/', (req, res) => {
     res.json({ message: 'Hospital Management System API is running...' });
 });
 
+// Auto-create database tables on startup
+const createTablesQuery = `
+    CREATE TABLE IF NOT EXISTS Patients (
+        patient_id INT AUTO_INCREMENT PRIMARY KEY,
+        first_name VARCHAR(50) NOT NULL,
+        last_name VARCHAR(50) NOT NULL,
+        gender VARCHAR(20),
+        dob DATE,
+        phone VARCHAR(20)
+    );
+
+    CREATE TABLE IF NOT EXISTS Doctors (
+        doctor_id INT AUTO_INCREMENT PRIMARY KEY,
+        first_name VARCHAR(50) NOT NULL,
+        last_name VARCHAR(50) NOT NULL,
+        specialization VARCHAR(100),
+        phone VARCHAR(20),
+        consultation_fee DECIMAL(10,2)
+    );
+
+    CREATE TABLE IF NOT EXISTS Appointments (
+        appointment_id INT AUTO_INCREMENT PRIMARY KEY,
+        patient_id INT,
+        doctor_id INT,
+        appointment_date DATETIME,
+        FOREIGN KEY (patient_id) REFERENCES Patients(patient_id) ON DELETE CASCADE,
+        FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS Prescriptions (
+        prescription_id INT AUTO_INCREMENT PRIMARY KEY,
+        appointment_id INT,
+        medication VARCHAR(100),
+        dosage VARCHAR(50),
+        instructions TEXT,
+        FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS Billing (
+        bill_id INT AUTO_INCREMENT PRIMARY KEY,
+        appointment_id INT,
+        total_amount DECIMAL(10,2),
+        payment_status VARCHAR(20),
+        FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id) ON DELETE CASCADE
+    );
+`;
+
+db.query(createTablesQuery, (err) => {
+    if (err) {
+        console.error("Error creating tables:", err);
+    } else {
+        console.log("All database tables verified/created successfully!");
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
