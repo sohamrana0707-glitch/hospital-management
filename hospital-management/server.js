@@ -72,13 +72,13 @@ const createTablesQuery = `
     );
 `;
 
-db.query(createTablesQuery, (err) => {
-    if (err) {
-        console.error("Error creating tables:", err);
-    } else {
+db.query(createTablesQuery)
+    .then(() => {
         console.log("All database tables verified/created successfully!");
-    }
-});
+    })
+    .catch((err) => {
+        console.error("Error creating tables:", err);
+    });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
